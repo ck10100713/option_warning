@@ -31,8 +31,14 @@ def get_fills_from_redis(acc='WKF_SHX870',date=dt.date.today(),night_session=Fal
     trd_df.set_index('time',inplace=True)
     return trd_df
 
-option_list = ['teo', 'tfo', 'tgo', 'nyo', 'oao', 'obo', 'ojo', 'oko', 'ooo', 'cco', 'cdo', 'cho', 'ddo', 'dqo'] #delete oco, nzo
-redis_key = {'teo':'capital_teo_main', 'tfo':'capital_tfo_main', 'tgo':'capital_tgo_mm', 'nyo':'capital_nyo_mm', 'oao':'capital_oao_mm', 'obo':'capital_obo_mm', 'ojo':'capital_ojo_mm', 'oko':'capital_oko_mm', 'ooo':'capital_ooo_mm', 'cco':'capital_cco_mm', 'cdo':'capital_cdo_mm', 'cho':'capital_cho_mm', 'ddo':'capital_ddo_mm', 'dqo':'capital_dqo_mm'}
+redis_key = {}
+option_list = ['teo', 'tfo', 'tgo', 'nyo', 'oao', 'obo', 'ojo', 'oko', 'ooo', 'cco', 'cdo', 'cho', 'ddo', 'dqo', 'cko', 'ceo', 'dho'] #delete oco, nzo
+for name in option_list:
+    if name == 'teo' or name == 'tfo':
+        redis_key[name] = 'capital_{}_main'.format(name)
+    else:
+        redis_key[name] = 'capital_{}_mm'.format(name)
+# redis_key = {'teo':'capital_teo_main', 'tfo':'capital_tfo_main', 'tgo':'capital_tgo_mm', 'nyo':'capital_nyo_mm', 'oao':'capital_oao_mm', 'obo':'capital_obo_mm', 'ojo':'capital_ojo_mm', 'oko':'capital_oko_mm', 'ooo':'capital_ooo_mm', 'cco':'capital_cco_mm', 'cdo':'capital_cdo_mm', 'cho':'capital_cho_mm', 'ddo':'capital_ddo_mm', 'dqo':'capital_dqo_mm'}
 sound = {}
 trade = dict()
 day = dt.date.today()
@@ -43,9 +49,12 @@ print('start')
 print('{} is ready'.format(option_list))
 while dt.datetime.now().time() > dt.time(8,20,0) and dt.datetime.now().time() < dt.time(16,15,0):
     for ins in option_list:
-        if trade[ins] != len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False)):
-            playsound.playsound(ins + '.mp3')
-            trade[ins] = len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False))
+        try:
+            if trade[ins] != len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False)):
+                playsound.playsound(ins + '.mp3')
+                trade[ins] = len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False))
+        except:
+            pass
     time.sleep(10)
 
 
