@@ -53,7 +53,8 @@ while dt.datetime.now().time() > dt.time(8,20,0) and dt.datetime.now().time() < 
             if trade[ins] != len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False)):
                 playsound.playsound(ins + '.mp3')
                 trade[ins] = len(get_fills_from_redis(redis_key[ins], day, redishost='prod1.capital.radiant-knight.com', night_session=False))
-        except:
+        except Exception as e:
+            print(e)
             pass
     time.sleep(10)
 
